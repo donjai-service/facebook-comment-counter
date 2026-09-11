@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Facebook Comment Counter</title>
-  <link rel="stylesheet" href="wheel.css">
+  <link rel="stylesheet" href="wheel.css?v=20260911-2">
   <style>
     :root {
       color-scheme: light;
@@ -378,6 +378,9 @@
               <label for="wheelTheme">ชุดสี</label><select id="wheelTheme"><option value="festival">สดใส</option><option value="golf">กอล์ฟ</option><option value="pastel">พาสเทล</option><option value="custom">กำหนดเอง</option></select>
               <div id="wheelSwatches" class="swatches"></div>
               <div class="setting-pair"><label for="wheelTextColor">สีชื่อ</label><input type="color" id="wheelTextColor" value="#ffffff"></div>
+              <label for="labelSize">ขนาดตัวหนังสือบนวงล้อ</label>
+              <div class="font-size-controls"><input id="labelSize" type="range" min="4" max="48" step="1" value="20"><input id="labelSizeNumber" aria-label="ขนาดตัวหนังสือ (px)" type="number" min="4" max="48" step="1" value="20"><span>px</span></div>
+              <button class="secondary small" id="fitLabels">ปรับให้พอดีกับจำนวนชื่อ</button>
               <label for="logoFile">โลโก้กลางวงล้อ</label><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp">
               <div class="setting-pair"><label for="logoSize">ขนาดโลโก้</label><input id="logoSize" type="range" min="12" max="32" value="20"></div>
               <button class="secondary small" id="removeLogo">ลบโลโก้</button>
@@ -386,6 +389,7 @@
             </details>
             <div class="setting-pair"><label for="spinDuration">เวลาหมุน <output id="durationLabel">6</output> วินาที</label><input id="spinDuration" type="range" min="3" max="15" value="6"></div>
             <label class="check-row"><input id="autoRemove" type="checkbox">นำผู้ชนะออกอัตโนมัติ</label>
+            <label class="check-row"><input id="celebrateWinner" type="checkbox" checked>พลุฉลองผู้ชนะ</label>
           </fieldset>
           <p id="wheelMessage" role="status"></p>
           <details open><summary>ประวัติผู้ชนะ <span id="historyCount">0</span></summary><ol id="winnerHistory"></ol><div class="actions"><button class="secondary" id="downloadWinners">ดาวน์โหลดผู้ชนะ</button><button class="secondary" id="clearWinners">ล้างประวัติ</button></div></details>
@@ -393,7 +397,8 @@
       </div>
     </section>
     <dialog id="winnerDialog" aria-labelledby="winnerLabel">
-      <p class="winner-eyebrow" id="winnerLabel">ผู้โชคดีรอบนี้</p><h2 id="winnerName"></h2>
+      <canvas id="celebrationCanvas" aria-hidden="true"></canvas>
+      <p class="winner-eyebrow" id="winnerLabel">ยินดีด้วย! ผู้โชคดีรอบนี้</p><h2 id="winnerName"></h2>
       <p id="winnerNote"></p><div class="actions"><button class="secondary" id="closeWinner">ปิด</button><button class="primary" id="removeWinner">นำชื่อนี้ออก</button></div>
     </dialog>
   </main>
@@ -584,6 +589,6 @@
     document.getElementById('downloadNames').addEventListener('click', downloadNames);
   </script>
   <script src="spin-wheel.js"></script>
-  <script src="wheel.js"></script>
+  <script src="wheel.js?v=20260911-2"></script>
 </body>
 </html>

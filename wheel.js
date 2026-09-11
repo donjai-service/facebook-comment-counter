@@ -9,6 +9,55 @@
   let colors = [...palettes.festival], entries = [], history = [], wheel, spinning = false;
   let selected = null, removed = false, snapshot = [], logoUrl = '', backgroundUrl = '';
   let imageLoads = 0;
+  let celebrationFrame = 0;
+  function stopCelebration() {
+    cancelAnimationFrame(celebrationFrame);
+    celebrationFrame = 0;
+    const canvas = $('celebrationCanvas');
+    canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  function celebrate() {
+    stopCelebration();
+    if (!$('celebrateWinner').checked || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const canvas = $('celebrationCanvas'), ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const width = innerWidth, height = innerHeight, ratio = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = width * ratio; canvas.height = height * ratio;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const particles = [], start = performance.now();
+    let previous = start, nextBurst = 0;
+    const fireColors = ['#ffce4b','#ff6c89','#65e4ce','#79b6ff','#ffffff'];
+    function burst(x, y) {
+      for (let i = 0; i < 64; i++) {
+        const angle = Math.PI * 2 * i / 64, speed = 70 + Math.random() * 160;
+        particles.push({ x, y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+          age:0, life:1.1+Math.random()*.7, color:fireColors[i%fireColors.length] });
+      }
+    }
+    function frame(now) {
+      if (!$('winnerDialog').open) { stopCelebration(); return; }
+      const elapsed = now - start, dt = Math.min((now - previous)/1000, .04); previous = now;
+      ctx.clearRect(0,0,width,height);
+      if (elapsed >= nextBurst && elapsed < 3200) {
+        burst(width*(.1+Math.random()*.25), height*(.12+Math.random()*.35));
+        burst(width*(.65+Math.random()*.25), height*(.12+Math.random()*.35));
+        nextBurst = elapsed + 650;
+      }
+      for(let i=particles.length-1;i>=0;i--) {
+        const p=particles[i]; p.age+=dt;
+        if(p.age>=p.life) { particles.splice(i,1); continue; }
+        const oldX=p.x, oldY=p.y;
+        p.vy+=90*dt; p.x+=p.vx*dt; p.y+=p.vy*dt;
+        ctx.globalAlpha=Math.pow(1-p.age/p.life,.6);
+        ctx.strokeStyle=p.color; ctx.lineWidth=2.5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(oldX,oldY); ctx.lineTo(p.x,p.y); ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+      if(elapsed<5200) celebrationFrame=requestAnimationFrame(frame);
+      else stopCelebration();
+    }
+    celebrationFrame=requestAnimationFrame(frame);
+  }
   function message(text = '') { $('wheelMessage').textContent = text; }
   function names() { return $('wheelNames').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean); }
   function showWheel(show) {
@@ -35,7 +84,7 @@
     const props = {
       items: (entries.length ? entries : Array(6).fill('')).map(label => ({label})),
       itemBackgroundColors: colors, itemLabelColors: [$('wheelTextColor').value],
-      itemLabelFont: 'system-ui, sans-serif', itemLabelFontSizeMax: 20,
+      itemLabelFont: 'system-ui, sans-serif', itemLabelFontSizeMax: Number($('labelSize').value),
       itemLabelRadius: .89, itemLabelRadiusMax: .25,
       lineColor: '#ffffff55', lineWidth: 1, borderColor: '#ffffff', borderWidth: 5,
       radius: .94, pointerAngle: 0, isInteractive: false,
@@ -93,6 +142,7 @@
     // Keep the result dialog visible while the stage is in fullscreen.
     (document.fullscreenElement || document.querySelector('main')).appendChild($('winnerDialog'));
     $('winnerDialog').showModal();
+    celebrate();
   }
   function removeWinner() {
     if (removed || selected === null) return;
@@ -140,6 +190,16 @@
     $('wheelTextColor').value = $('wheelTheme').value === 'pastel' ? '#24323a' : '#ffffff'; swatches(); draw();
   };
   $('wheelTextColor').oninput = draw;
+  function setLabelSize(value) {
+    const size = Math.max(4, Math.min(48, Math.round(Number(value)) || 20));
+    $('labelSize').value = size; $('labelSizeNumber').value = size; draw();
+  }
+  $('labelSize').oninput = () => setLabelSize($('labelSize').value);
+  $('labelSizeNumber').oninput = () => {
+    if ($('labelSizeNumber').value !== '') setLabelSize($('labelSizeNumber').value);
+  };
+  $('labelSizeNumber').onchange = () => setLabelSize($('labelSizeNumber').value);
+  $('fitLabels').onclick = () => setLabelSize(Math.min(20, Math.floor(800 / Math.max(names().length, 1))));
   $('spinDuration').oninput = () => { $('durationLabel').textContent = $('spinDuration').value; };
   $('logoSize').oninput = () => { document.querySelector('.wheel-hub').style.width = $('logoSize').value + '%'; };
   $('logoFile').onchange = event => uploadImage(event.target, 'logo');
@@ -151,6 +211,8 @@
   $('removeBackground').onclick = () => { $('wheelStage').style.backgroundImage = ''; URL.revokeObjectURL(backgroundUrl); backgroundUrl = ''; };
   $('spinWheel').onclick = spin;
   $('closeWinner').onclick = () => $('winnerDialog').close();
+  $('winnerDialog').addEventListener('close', stopCelebration);
+  $('winnerDialog').addEventListener('cancel', stopCelebration);
   $('removeWinner').onclick = removeWinner;
   $('clearWinners').onclick = () => { history = []; renderHistory(); };
   $('downloadWinners').onclick = () => {

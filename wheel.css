@@ -33,6 +33,9 @@ input[type=color] { width:34px; height:34px; border:1px solid var(--line); paddi
 .setting-pair input[type=range] { width:110px; }
 .wheel-settings input[type=file] { width:100%; font-size:12px; margin-bottom:8px; }
 .small { padding:6px 10px; margin:0 0 16px; }
+.font-size-controls { display:grid; grid-template-columns:minmax(0,1fr) 64px 22px; align-items:center; gap:8px; margin:0 0 10px; }
+.font-size-controls input[type=range] { width:100%; min-width:0; }
+.font-size-controls input[type=number] { width:64px; padding:8px 4px; border:1px solid var(--line); border-radius:4px; font:inherit; }
 #wheelMessage { color:var(--danger); font-size:13px; overflow-wrap:anywhere; }
 #winnerHistory { max-height:250px; overflow:auto; padding-left:28px; }
 #winnerHistory li { padding:7px 0; overflow-wrap:anywhere; }
@@ -41,6 +44,8 @@ input[type=color] { width:34px; height:34px; border:1px solid var(--line); paddi
 #winnerDialog::backdrop { background:#101820b8; }
 #winnerDialog h2 { font-size:30px; overflow-wrap:anywhere; margin:16px 0; }
 #winnerDialog .actions { justify-content:center; }
+#winnerDialog > :not(canvas) { position:relative; z-index:1; }
+#celebrationCanvas { position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0; }
 .winner-eyebrow { color:#137a58; font-weight:700; }
 .wheel-stage:fullscreen { overflow:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; background-color:#eef3f6; }
 .wheel-stage:fullscreen .stage-heading { width:100%; }
