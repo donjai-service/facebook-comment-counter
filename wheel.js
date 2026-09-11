@@ -8,6 +8,28 @@
   };
   let colors = [...palettes.festival], entries = [], history = [], wheel, spinning = false;
   const enabledColors = Array(6).fill(true);
+  const colorStorageKey = 'facebook-comment-counter.wheel-colors.v1';
+  function saveColors() {
+    try {
+      localStorage.setItem(colorStorageKey, JSON.stringify({
+        colors, enabledColors, theme: $('wheelTheme').value, textColor: $('wheelTextColor').value
+      }));
+    } catch { /* The wheel remains usable when browser storage is unavailable. */ }
+  }
+  function restoreColors() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(colorStorageKey));
+      const isColor = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+      if (!saved || !Array.isArray(saved.colors) || saved.colors.length !== 6 || !saved.colors.every(isColor)) return;
+      colors = [...saved.colors];
+      if (Array.isArray(saved.enabledColors) && saved.enabledColors.length === 6 &&
+          saved.enabledColors.every(value => typeof value === 'boolean') && saved.enabledColors.some(Boolean)) {
+        enabledColors.splice(0, 6, ...saved.enabledColors);
+      }
+      $('wheelTheme').value = Object.hasOwn(palettes, saved.theme) ? saved.theme : 'custom';
+      if (isColor(saved.textColor)) $('wheelTextColor').value = saved.textColor;
+    } catch { /* Ignore damaged or inaccessible saved settings. */ }
+  }
   let selected = null, removed = false, snapshot = [], logoUrl = '', backgroundUrl = '';
   let imageLoads = 0;
   let celebrationFrame = 0;
@@ -103,10 +125,10 @@
       label.append(toggle, document.createTextNode('สี ' + (i+1)));
       const input = document.createElement('input'); input.type = 'color'; input.value = color;
       input.setAttribute('aria-label', 'สีช่องที่ ' + (i+1));
-      input.addEventListener('input', () => { colors[i] = input.value; $('wheelTheme').value = 'custom'; draw(); });
+      input.addEventListener('input', () => { colors[i] = input.value; $('wheelTheme').value = 'custom'; saveColors(); draw(); });
       toggle.addEventListener('change', () => {
         enabledColors[i] = toggle.checked;
-        updateSwatchState(); draw();
+        updateSwatchState(); saveColors(); draw();
       });
       group.append(label, input); return group;
     }));
@@ -207,9 +229,9 @@
   $('wheelTitle').oninput = () => { $('wheelHeading').textContent = $('wheelTitle').value || 'วงล้อผู้โชคดี'; };
   $('wheelTheme').onchange = () => {
     if (palettes[$('wheelTheme').value]) colors = [...palettes[$('wheelTheme').value]];
-    $('wheelTextColor').value = $('wheelTheme').value === 'pastel' ? '#24323a' : '#ffffff'; swatches(); draw();
+    $('wheelTextColor').value = $('wheelTheme').value === 'pastel' ? '#24323a' : '#ffffff'; swatches(); saveColors(); draw();
   };
-  $('wheelTextColor').oninput = draw;
+  $('wheelTextColor').oninput = () => { saveColors(); draw(); };
   function setLabelSize(value) {
     const size = Math.max(4, Math.min(48, Math.round(Number(value)) || 20));
     $('labelSize').value = size; $('labelSizeNumber').value = size; draw();
@@ -250,5 +272,5 @@
   };
   document.addEventListener('fullscreenchange', () => { $('presentWheel').textContent = document.fullscreenElement ? 'ออกเต็มหน้าจอ' : 'เต็มหน้าจอ'; });
   document.addEventListener('keydown', e => { if(e.key === 'Escape') { document.body.classList.remove('presenting'); $('presentWheel').textContent = document.fullscreenElement ? 'ออกเต็มหน้าจอ' : 'เต็มหน้าจอ'; } });
-  swatches();
+  restoreColors(); swatches();
 })();
