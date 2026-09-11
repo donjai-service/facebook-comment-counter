@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Facebook Comment Counter</title>
+  <link rel="stylesheet" href="wheel.css">
   <style>
     :root {
       color-scheme: light;
@@ -280,7 +281,11 @@
       </div>
     </header>
 
-    <section class="grid">
+    <nav class="workspace-tabs" aria-label="เครื่องมือ">
+      <button class="active" id="showCounter" aria-pressed="true">นับคอมเมนต์</button>
+      <button id="showWheel" aria-pressed="false">วงล้อสุ่มรายชื่อ</button>
+    </nav>
+    <section class="grid" id="counterView">
       <div class="panel">
         <label for="source">ข้อความคอมเมนต์</label>
         <textarea id="source" placeholder="วางข้อความจาก Facebook ตรงนี้ เช่น&#10;ชื่อคน&#10;·&#10;ตอบ C. 36 System&#10;ตอบกลับ"></textarea>
@@ -343,6 +348,7 @@
         <div class="actions" style="margin: 0 0 12px;">
           <button class="secondary" id="copyNames">คัดลอกรายชื่อ</button>
           <button class="secondary" id="downloadNames">ดาวน์โหลด .txt</button>
+          <button class="primary" id="sendToWheel">นำรายชื่อไปวงล้อ</button>
         </div>
 
         <div class="list" id="resultList">
@@ -350,6 +356,46 @@
         </div>
       </div>
     </section>
+    <section id="wheelView" hidden>
+      <div class="wheel-layout">
+        <div class="wheel-stage" id="wheelStage">
+          <div class="stage-heading"><h2 id="wheelHeading">วงล้อผู้โชคดี</h2><button class="secondary" id="presentWheel">เต็มหน้าจอ</button></div>
+          <div class="wheel-frame">
+            <div id="wheelCanvas" role="img" aria-label="วงล้อสุ่มรายชื่อ"></div>
+            <div class="wheel-pointer" aria-hidden="true"></div>
+            <div class="wheel-hub"><img id="wheelLogo" alt="โลโก้กลางวงล้อ" hidden><span id="hubText">LUCKY<br>DRAW</span></div>
+          </div>
+          <p id="spinStatus" role="status">ยังไม่มีรายชื่อ</p>
+          <button class="primary spin-button" id="spinWheel" disabled>หมุนวงล้อ</button>
+        </div>
+        <aside class="wheel-settings">
+          <fieldset id="wheelSettings">
+            <label for="wheelTitle">ชื่อกิจกรรม</label><input type="text" id="wheelTitle" value="วงล้อผู้โชคดี" maxlength="100">
+            <div class="section-label"><label for="wheelNames">รายชื่อในวงล้อ</label><output id="wheelCount">0 คน</output></div>
+            <textarea id="wheelNames" placeholder="รายชื่อ 1 คนต่อบรรทัด" spellcheck="false"></textarea>
+            <div class="actions"><button class="secondary" id="importWheel">ใช้รายชื่อที่นับได้</button><button class="secondary" id="uniqueWheel">ตัดชื่อซ้ำ</button></div>
+            <details open><summary>สีและรูปภาพ</summary>
+              <label for="wheelTheme">ชุดสี</label><select id="wheelTheme"><option value="festival">สดใส</option><option value="golf">กอล์ฟ</option><option value="pastel">พาสเทล</option><option value="custom">กำหนดเอง</option></select>
+              <div id="wheelSwatches" class="swatches"></div>
+              <div class="setting-pair"><label for="wheelTextColor">สีชื่อ</label><input type="color" id="wheelTextColor" value="#ffffff"></div>
+              <label for="logoFile">โลโก้กลางวงล้อ</label><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp">
+              <div class="setting-pair"><label for="logoSize">ขนาดโลโก้</label><input id="logoSize" type="range" min="12" max="32" value="20"></div>
+              <button class="secondary small" id="removeLogo">ลบโลโก้</button>
+              <label for="backgroundFile">รูปพื้นหลัง</label><input id="backgroundFile" type="file" accept="image/png,image/jpeg,image/webp">
+              <button class="secondary small" id="removeBackground">ลบรูปพื้นหลัง</button>
+            </details>
+            <div class="setting-pair"><label for="spinDuration">เวลาหมุน <output id="durationLabel">6</output> วินาที</label><input id="spinDuration" type="range" min="3" max="15" value="6"></div>
+            <label class="check-row"><input id="autoRemove" type="checkbox">นำผู้ชนะออกอัตโนมัติ</label>
+          </fieldset>
+          <p id="wheelMessage" role="status"></p>
+          <details open><summary>ประวัติผู้ชนะ <span id="historyCount">0</span></summary><ol id="winnerHistory"></ol><div class="actions"><button class="secondary" id="downloadWinners">ดาวน์โหลดผู้ชนะ</button><button class="secondary" id="clearWinners">ล้างประวัติ</button></div></details>
+        </aside>
+      </div>
+    </section>
+    <dialog id="winnerDialog" aria-labelledby="winnerLabel">
+      <p class="winner-eyebrow" id="winnerLabel">ผู้โชคดีรอบนี้</p><h2 id="winnerName"></h2>
+      <p id="winnerNote"></p><div class="actions"><button class="secondary" id="closeWinner">ปิด</button><button class="primary" id="removeWinner">นำชื่อนี้ออก</button></div>
+    </dialog>
   </main>
 
   <script>
@@ -537,5 +583,7 @@
     document.getElementById('copyNames').addEventListener('click', copyNames);
     document.getElementById('downloadNames').addEventListener('click', downloadNames);
   </script>
+  <script src="spin-wheel.js"></script>
+  <script src="wheel.js"></script>
 </body>
 </html>
