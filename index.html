@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Facebook Comment Counter</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #667085;
+      --line: #d9e1ec;
+      --primary: #1769e0;
+      --primary-dark: #0f4fb1;
+      --soft: #eaf2ff;
+      --danger: #b42318;
+      --ok: #0f7b45;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 28px rgba(16, 24, 40, 0.06);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #344054;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 460px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      color: var(--ink);
+      background: #fff;
+      font: 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .checks {
+      display: grid;
+      gap: 8px;
+      margin: 12px 0 14px;
+      color: #344054;
+      font-size: 14px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .secondary {
+      background: #fff;
+      border-color: var(--line);
+      color: #344054;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: var(--soft);
+      border: 1px solid #cfe0ff;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--primary-dark);
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 6px;
+      color: #344054;
+      font-size: 13px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 12px;
+    }
+
+    .tab {
+      border: 0;
+      border-bottom: 3px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 8px;
+    }
+
+    .tab.active {
+      color: var(--primary-dark);
+      border-bottom-color: var(--primary);
+    }
+
+    .list {
+      min-height: 280px;
+      max-height: 520px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 10px;
+      padding: 9px 12px;
+      border-bottom: 1px solid #eef2f6;
+      font-size: 14px;
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .num {
+      color: var(--muted);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .reason {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .ok {
+      color: var(--ok);
+    }
+
+    .empty {
+      padding: 28px 16px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        display: block;
+      }
+
+      .controls,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>ตัวนับรายชื่อคอมเมนต์ Facebook</h1>
+        <p class="sub">วางข้อความคอมเมนต์ที่คัดลอกจาก Facebook แล้วโปรแกรมจะดึงชื่อ นับจำนวน และตัดรายการที่ไม่มีคำตอบจริง</p>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="panel">
+        <label for="source">ข้อความคอมเมนต์</label>
+        <textarea id="source" placeholder="วางข้อความจาก Facebook ตรงนี้ เช่น&#10;ชื่อคน&#10;·&#10;ตอบ C. 36 System&#10;ตอบกลับ"></textarea>
+
+        <div class="controls">
+          <div>
+            <label for="keywords">คำที่ถือว่าเป็นคำตอบ</label>
+            <input id="keywords" type="text" value="A,B,C,D,34,35,36,37,66,90,107,108,109,110,120,140,141,142,143,System,ระบบ,โปร,หมุด,หลา,ข้อ,ตอบ">
+          </div>
+          <div>
+            <label for="stopwords">บรรทัดที่ไม่ใช่ชื่อ/คำตอบ</label>
+            <input id="stopwords" type="text" value="ความคิดเห็น,ดูคำแปล,ดูภาษาต้นฉบับ,แก้ไขแล้ว">
+          </div>
+        </div>
+
+        <div class="checks">
+          <label class="check-row">
+            <input id="dedupe" type="checkbox" checked>
+            นับชื่อซ้ำเป็น 1 สิทธิ์
+          </label>
+          <label class="check-row">
+            <input id="requireKeyword" type="checkbox" checked>
+            ตัดรายการที่ไม่มีคำตอบตามคำด้านบน
+          </label>
+          <label class="check-row">
+            <input id="ignoreImageOnly" type="checkbox" checked>
+            ตัดคอมเมนต์ที่มีแค่รูป/คำบรรยายรูป
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="analyze">วิเคราะห์รายชื่อ</button>
+          <button class="secondary" id="clear">ล้างข้อความ</button>
+        </div>
+        <p class="note">ถ้าไม่อยากกำหนดคำตอบ ให้เว้นช่องคำที่ถือว่าเป็นคำตอบว่างไว้ หรือเอาเครื่องหมายถูกออกจาก “ตัดรายการที่ไม่มีคำตอบตามคำด้านบน” โปรแกรมจะนับทุกคอมเมนต์ที่มีข้อความและตัดเฉพาะรูป/สติ๊กเกอร์อย่างเดียว</p>
+        <p class="note">ใช้กับข้อความที่คัดลอกจากหน้าโพสต์ ไม่ดึงข้อมูลจาก URL โดยตรง เพราะ Facebook จำกัดการเข้าถึงคอมเมนต์ผ่านหน้าเว็บและสิทธิ์บัญชี</p>
+      </div>
+
+      <div class="panel">
+        <div class="stats">
+          <div class="stat">
+            <strong id="countIncluded">0</strong>
+            <span>รายชื่อที่นับ</span>
+          </div>
+          <div class="stat">
+            <strong id="countExcluded">0</strong>
+            <span>รายการที่ตัดออก</span>
+          </div>
+          <div class="stat">
+            <strong id="countRaw">0</strong>
+            <span>คอมเมนต์ที่พบ</span>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab active" id="tabIncluded" type="button">รายชื่อที่นับ</button>
+          <button class="tab" id="tabExcluded" type="button">รายการที่ตัดออก</button>
+        </div>
+
+        <div class="actions" style="margin: 0 0 12px;">
+          <button class="secondary" id="copyNames">คัดลอกรายชื่อ</button>
+          <button class="secondary" id="downloadNames">ดาวน์โหลด .txt</button>
+        </div>
+
+        <div class="list" id="resultList">
+          <div class="empty">ยังไม่มีข้อมูล</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const source = document.getElementById('source');
+    const keywordsInput = document.getElementById('keywords');
+    const stopwordsInput = document.getElementById('stopwords');
+    const dedupeInput = document.getElementById('dedupe');
+    const requireKeywordInput = document.getElementById('requireKeyword');
+    const ignoreImageOnlyInput = document.getElementById('ignoreImageOnly');
+    const resultList = document.getElementById('resultList');
+    const countIncluded = document.getElementById('countIncluded');
+    const countExcluded = document.getElementById('countExcluded');
+    const countRaw = document.getElementById('countRaw');
+    const tabIncluded = document.getElementById('tabIncluded');
+    const tabExcluded = document.getElementById('tabExcluded');
+    let included = [];
+    let excluded = [];
+    let activeTab = 'included';
+
+    function normalizeLine(line) {
+      return line.replace(/\u00a0/g, ' ').trim();
+    }
+
+    function cleanMarkdownLine(line) {
+      const markdownLink = line.match(/^\[?\*{0,2}([^\]\*]+?)\*{0,2}\]?\((https?:\/\/[^)]+)\)$/);
+      if (markdownLink) return markdownLink[1].trim();
+      return line.replace(/\*\*/g, '').trim();
+    }
+
+    function cleanName(line) {
+      return cleanMarkdownLine(line)
+        .replace(/^ความคิดเห็น\s+/, '')
+        .trim();
+    }
+
+    function isNoiseLine(line, stopwords) {
+      if (!line || line === '·' || line === 'โดยผู้เขียน') return true;
+      return stopwords.some(word => line === word || line.startsWith(word));
+    }
+
+    function isImageLine(line) {
+      return [
+        'อาจเป็นรูปภาพ',
+        'อาจเป็นลายเส้น',
+        'อาจเป็นภาพวาด',
+        'ไม่มีคำอธิบายรูปภาพ'
+      ].some(prefix => line.startsWith(prefix));
+    }
+
+    function hasLettersOrNumbers(text) {
+      return /[\p{L}\p{N}]/u.test(text);
+    }
+
+    function hasAnswerKeyword(text, keywords) {
+      if (!keywords.length) return true;
+      const compact = text.toLowerCase().replace(/\s+/g, '');
+      return keywords.some(keyword => {
+        const key = keyword.toLowerCase().replace(/\s+/g, '');
+        if (!key) return false;
+        if (/^[abcd]$/i.test(key)) {
+          return new RegExp(`(^|[^a-z])${key}($|[^a-z])`, 'i').test(text);
+        }
+        return compact.includes(key);
+      });
+    }
+
+    function parseComments() {
+      const stopwords = stopwordsInput.value.split(',').map(v => v.trim()).filter(Boolean);
+      const keywords = keywordsInput.value.split(',').map(v => v.trim()).filter(Boolean);
+      const blocks = source.value.split('ตอบกลับ').map(block => block.trim()).filter(Boolean);
+      const seen = new Set();
+      included = [];
+      excluded = [];
+
+      for (const block of blocks) {
+        const lines = block.split(/\r?\n/).map(normalizeLine).filter(Boolean);
+        const filtered = lines.filter(line => !isNoiseLine(line, stopwords));
+        if (!filtered.length) continue;
+
+        const name = cleanName(filtered[0]);
+        const content = [];
+        let imageOnly = false;
+
+        for (const line of filtered.slice(1)) {
+          const cleanedLine = cleanMarkdownLine(line);
+          if (isImageLine(line)) {
+            imageOnly = content.length === 0;
+            break;
+          }
+          content.push(cleanedLine);
+        }
+
+        const text = content.join(' ').trim();
+        let reason = '';
+
+        if (!text || !hasLettersOrNumbers(text)) {
+          reason = 'ไม่มีข้อความคำตอบจริง';
+        } else if (ignoreImageOnlyInput.checked && imageOnly) {
+          reason = 'มีแค่รูปหรือคำบรรยายรูป';
+        } else if (requireKeywordInput.checked && !hasAnswerKeyword(text, keywords)) {
+          reason = 'ไม่พบคำตอบตามคำที่ตั้งไว้';
+        } else if (dedupeInput.checked && seen.has(name)) {
+          reason = 'ชื่อซ้ำ';
+        }
+
+        if (reason) {
+          excluded.push({ name, text, reason });
+        } else {
+          included.push({ name, text });
+          seen.add(name);
+        }
+      }
+
+      countIncluded.textContent = included.length;
+      countExcluded.textContent = excluded.length;
+      countRaw.textContent = blocks.length;
+      render();
+    }
+
+    function render() {
+      const data = activeTab === 'included' ? included : excluded;
+      tabIncluded.classList.toggle('active', activeTab === 'included');
+      tabExcluded.classList.toggle('active', activeTab === 'excluded');
+
+      if (!data.length) {
+        resultList.innerHTML = '<div class="empty">ไม่มีรายการ</div>';
+        return;
+      }
+
+      resultList.innerHTML = data.map((item, index) => {
+        const text = activeTab === 'included'
+          ? `<div class="ok">${escapeHtml(item.text)}</div>`
+          : `<div>${escapeHtml(item.text || '-')}</div><div class="reason">${escapeHtml(item.reason)}</div>`;
+        return `<div class="row"><div class="num">${index + 1}</div><div><strong>${escapeHtml(item.name)}</strong>${text}</div></div>`;
+      }).join('');
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function copyNames() {
+      const names = included.map(item => item.name).join('\n');
+      await navigator.clipboard.writeText(names);
+      const old = document.getElementById('copyNames').textContent;
+      document.getElementById('copyNames').textContent = 'คัดลอกแล้ว';
+      setTimeout(() => document.getElementById('copyNames').textContent = old, 1200);
+    }
+
+    function downloadNames() {
+      const blob = new Blob([included.map(item => item.name).join('\n')], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'facebook-comment-names.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('analyze').addEventListener('click', parseComments);
+    document.getElementById('clear').addEventListener('click', () => {
+      source.value = '';
+      included = [];
+      excluded = [];
+      countIncluded.textContent = '0';
+      countExcluded.textContent = '0';
+      countRaw.textContent = '0';
+      render();
+    });
+    tabIncluded.addEventListener('click', () => {
+      activeTab = 'included';
+      render();
+    });
+    tabExcluded.addEventListener('click', () => {
+      activeTab = 'excluded';
+      render();
+    });
+    document.getElementById('copyNames').addEventListener('click', copyNames);
+    document.getElementById('downloadNames').addEventListener('click', downloadNames);
+  </script>
+</body>
+</html>
