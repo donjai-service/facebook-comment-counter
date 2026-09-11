@@ -7,6 +7,7 @@
     pastel: ['#f3b5c0','#f2d699','#a8d8cc','#a9c9ef','#cbb9e3','#edc2a3']
   };
   let colors = [...palettes.festival], entries = [], history = [], wheel, spinning = false;
+  const enabledColors = Array(6).fill(true);
   let selected = null, removed = false, snapshot = [], logoUrl = '', backgroundUrl = '';
   let imageLoads = 0;
   let celebrationFrame = 0;
@@ -83,7 +84,7 @@
     }
     const props = {
       items: (entries.length ? entries : Array(6).fill('')).map(label => ({label})),
-      itemBackgroundColors: colors, itemLabelColors: [$('wheelTextColor').value],
+      itemBackgroundColors: colors.filter((_, i) => enabledColors[i]), itemLabelColors: [$('wheelTextColor').value],
       itemLabelFont: 'system-ui, sans-serif', itemLabelFontSizeMax: Number($('labelSize').value),
       itemLabelRadius: .89, itemLabelRadiusMax: .25,
       lineColor: '#ffffff55', lineWidth: 1, borderColor: '#ffffff', borderWidth: 5,
@@ -95,11 +96,30 @@
   }
   function swatches() {
     $('wheelSwatches').replaceChildren(...colors.map((color,i) => {
+      const group = document.createElement('div'); group.className = 'color-slot';
+      const label = document.createElement('label');
+      const toggle = document.createElement('input'); toggle.type = 'checkbox'; toggle.checked = enabledColors[i];
+      toggle.setAttribute('aria-label', 'ใช้สีที่ ' + (i+1));
+      label.append(toggle, document.createTextNode('สี ' + (i+1)));
       const input = document.createElement('input'); input.type = 'color'; input.value = color;
       input.setAttribute('aria-label', 'สีช่องที่ ' + (i+1));
       input.addEventListener('input', () => { colors[i] = input.value; $('wheelTheme').value = 'custom'; draw(); });
-      return input;
+      toggle.addEventListener('change', () => {
+        enabledColors[i] = toggle.checked;
+        updateSwatchState(); draw();
+      });
+      group.append(label, input); return group;
     }));
+    updateSwatchState();
+  }
+  function updateSwatchState() {
+    const count = enabledColors.filter(Boolean).length;
+    [...$('wheelSwatches').children].forEach((group, i) => {
+      group.classList.toggle('color-slot-off', !enabledColors[i]);
+      group.querySelector('input[type=color]').disabled = !enabledColors[i];
+      // A wheel must retain at least one active color.
+      group.querySelector('input[type=checkbox]').disabled = count === 1 && enabledColors[i];
+    });
   }
   function importNames() {
     if (spinning) return;
