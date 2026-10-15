@@ -216,6 +216,7 @@
       } else {
         if (backgroundUrl) URL.revokeObjectURL(backgroundUrl); backgroundUrl = url;
         $('wheelStage').style.backgroundImage = `url("${url}")`;
+        $('backgroundInfo').textContent = file.name + ' · ' + img.naturalWidth + ' × ' + img.naturalHeight + ' px';
       }
       message();
     } catch { URL.revokeObjectURL(url); message('อ่านรูปนี้ไม่ได้ กรุณาเลือกไฟล์ใหม่'); }
@@ -246,11 +247,15 @@
   $('logoSize').oninput = () => { document.querySelector('.wheel-hub').style.width = $('logoSize').value + '%'; };
   $('logoFile').onchange = event => uploadImage(event.target, 'logo');
   $('backgroundFile').onchange = event => uploadImage(event.target, 'background');
+  $('backgroundFit').onchange = () => { $('wheelStage').style.backgroundSize = $('backgroundFit').value; };
   $('removeLogo').onclick = () => {
     $('wheelLogo').hidden = true; $('wheelLogo').removeAttribute('src'); $('hubText').hidden = false;
     URL.revokeObjectURL(logoUrl); logoUrl = '';
   };
-  $('removeBackground').onclick = () => { $('wheelStage').style.backgroundImage = ''; URL.revokeObjectURL(backgroundUrl); backgroundUrl = ''; };
+  $('removeBackground').onclick = () => {
+    $('wheelStage').style.backgroundImage = ''; URL.revokeObjectURL(backgroundUrl); backgroundUrl = '';
+    $('backgroundInfo').textContent = '';
+  };
   $('spinWheel').onclick = spin;
   $('closeWinner').onclick = () => $('winnerDialog').close();
   $('winnerDialog').addEventListener('close', stopCelebration);
