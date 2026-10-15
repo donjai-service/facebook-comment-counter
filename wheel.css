@@ -5,7 +5,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .workspace-tabs button { background:transparent; border-radius:0; border-bottom:3px solid transparent; color:var(--muted); }
 .workspace-tabs button.active { border-color:var(--primary); color:var(--primary); }
 .wheel-layout { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:28px; align-items:start; }
-.wheel-stage { background:#eef3f6; background-position:center; background-size:cover; padding:20px; min-width:0; text-align:center; }
+.wheel-stage { background:#eef3f6; background-position:center; background-size:cover; background-repeat:no-repeat; padding:20px; min-width:0; text-align:center; }
 .stage-heading { display:flex; gap:12px; align-items:center; justify-content:space-between; text-align:left; }
 .stage-heading h2 { font-size:22px; margin:0; overflow-wrap:anywhere; background:#fffffff0; padding:6px 10px; max-width:75%; }
 .stage-heading button { flex-shrink:0; }
@@ -37,6 +37,9 @@ input[type=color] { width:34px; height:34px; border:1px solid var(--line); paddi
 .setting-pair label { margin:0; }
 .setting-pair input[type=range] { width:110px; }
 .wheel-settings input[type=file] { width:100%; font-size:12px; margin-bottom:8px; }
+.upload-hint { font-size:12px; line-height:1.6; color:var(--muted); margin:6px 0 10px; overflow-wrap:anywhere; }
+.upload-hint:empty { display:none; }
+#backgroundFit { margin-bottom:12px; }
 .small { padding:6px 10px; margin:0 0 16px; }
 .font-size-controls { display:grid; grid-template-columns:minmax(0,1fr) 64px 22px; align-items:center; gap:8px; margin:0 0 10px; }
 .font-size-controls input[type=range] { width:100%; min-width:0; }
