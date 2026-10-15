@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Facebook Comment Counter</title>
-  <link rel="stylesheet" href="wheel.css?v=20260911-3">
+  <link rel="stylesheet" href="wheel.css?v=20261015-1">
   <style>
     :root {
       color-scheme: light;
@@ -384,7 +384,12 @@
               <label for="logoFile">โลโก้กลางวงล้อ</label><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp">
               <div class="setting-pair"><label for="logoSize">ขนาดโลโก้</label><input id="logoSize" type="range" min="12" max="32" value="20"></div>
               <button class="secondary small" id="removeLogo">ลบโลโก้</button>
-              <label for="backgroundFile">รูปพื้นหลัง</label><input id="backgroundFile" type="file" accept="image/png,image/jpeg,image/webp">
+              <label for="backgroundFile">ภาพพื้นหลังด้านหลังวงล้อ (พื้นที่สีเทา)</label>
+              <p class="upload-hint" id="backgroundHint">ขนาดแนะนำ 1920 × 1080 px (16:9) สำหรับเต็มหน้าจอ หรือ 1200 × 1200 px สำหรับมุมมองปกติ<br>PNG, JPG หรือ WebP ไม่เกิน 10 MB · ใช้ขนาดอื่นได้</p>
+              <input id="backgroundFile" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="backgroundHint backgroundInfo">
+              <p class="upload-hint" id="backgroundInfo" role="status"></p>
+              <label for="backgroundFit">การจัดวางภาพพื้นหลัง</label>
+              <select id="backgroundFit"><option value="cover">เต็มพื้นที่ (อาจตัดขอบภาพ)</option><option value="contain">เต็มภาพ (อาจเหลือขอบสีเทา)</option></select>
               <button class="secondary small" id="removeBackground">ลบรูปพื้นหลัง</button>
             </details>
             <div class="setting-pair"><label for="spinDuration">เวลาหมุน <output id="durationLabel">6</output> วินาที</label><input id="spinDuration" type="range" min="3" max="15" value="6"></div>
@@ -589,6 +594,6 @@
     document.getElementById('downloadNames').addEventListener('click', downloadNames);
   </script>
   <script src="spin-wheel.js"></script>
-  <script src="wheel.js?v=20260911-4"></script>
+  <script src="wheel.js?v=20261015-1"></script>
 </body>
 </html>
